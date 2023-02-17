@@ -1,0 +1,73 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
+      MYSQL_USER: ${WORDPRESS_DB_USER}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - wp_data:/var/www/html
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
+    networks:
+      - proxy-tier
+
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PMA_USER: ${PHPMYADMIN_USERNAME}
+      PMA_PASSWORD: ${PHPMYADMIN_PASSWORD}
+    ports:
+      - "8080:80"
+    networks:
+      - proxy-tier
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager
+    restart: always
+    ports:
+      - "81:81"
+      - "443:443"
+      - "2222:22"
+    environment:
+      DB_MYSQL_HOST: db
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: ${WORDPRESS_DB_USER}
+      DB_MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      DB_MYSQL_NAME: ${WORDPRESS_DB_NAME}
+    volumes:
+      - appdata:/appdata
+    networks:
+      - proxy-tier
+
+volumes:
+  db_data:
+  wp_data:
+  certs:
+  appdata:
+
+networks:
+  proxy-tier:
+
