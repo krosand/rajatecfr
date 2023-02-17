@@ -1,7 +1,7 @@
 version: '3'
 services:
   nginx-proxy-manager:
-    container_name: nginx-proxy-manager
+    container_name: pp-nginx-proxy-manager
     image: 'jc21/nginx-proxy-manager:latest'
     restart: always
     ports:
@@ -17,16 +17,16 @@ services:
       - /mnt/docker/ppnginx-proxy-manager/data:/data
       - /mnt/docker/ppnginx-proxy-manager/letsencrypt:/etc/letsencrypt
     networks:
-      - nginx-proxy-manager-nw
-      - reverseproxy-nw
+      - pp-nginx-proxy-manager-nw
+      - pp-reverseproxy-nw
 
   nginx-proxy-manager-db:
-    container_name: nginx-proxy-manager-db
+    container_name: pp-nginx-proxy-manager-db
     image: 'jc21/mariadb-aria:latest'
     restart: always
     environment:
-      - MYSQL_DATABASE=npm
-      - MYSQL_USER=npm
+      - MYSQL_DATABASE=ppnpm
+      - MYSQL_USER=ppnpm
       - MYSQL_PASSWORD=${DB_MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
