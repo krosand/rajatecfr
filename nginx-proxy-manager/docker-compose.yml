@@ -5,7 +5,6 @@ services:
     image: 'jc21/nginx-proxy-manager:latest'
     restart: always
     ports:
-      - '80:80'
       - '81:81'
       - '443:443'
     environment:
@@ -38,4 +37,3 @@ services:
 networks:
   nginx-proxy-manager-nw:
   reverseproxy-nw:
-    external: true
