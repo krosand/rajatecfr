@@ -1,0 +1,62 @@
+version: '3.7'
+services:
+  wordpress:
+    container_name: pp-wordpress
+    depends_on:
+      - ppdb
+    image: wordpress:latest
+    volumes:
+      - /mnt/docker/ppwordpress:/var/www/html
+      - /mnt/docker/ppwordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: ppdb:3306
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    ports:
+      - "8081:80"
+    networks:
+      - pp-app-tier
+      - pp-db-tier
+  ppdb:
+    container_name: pp-mariadb
+    image: mariadb
+    volumes:
+      - /mnt/docker/ppmariadb:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
+      MYSQL_USER: ${WORDPRESS_DB_USER}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    networks:
+      - pp-db-tier
+  nginx-proxy-manager:
+    container_name: pp-nginx_proxy_manager
+    image: jc21/nginx-proxy-manager
+    restart: always
+    ports:
+      - "82:81"
+      - "444:443"
+      - "2223:22"
+    environment:
+      DB_MYSQL_HOST: ppdb
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: ${WORDPRESS_DB_USER}
+      DB_MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      DB_MYSQL_NAME: ${WORDPRESS_DB_NAME}
+    volumes:
+      - /mnt/docker/ppnginx-proxy-manager:/appdata
+    networks:
+      - pp-proxy-tier
+
+volumes:
+  pp-wp_data:
+  pp-db_data:
+  pp-nginx_data:
+
+networks:
+  pp-app-tier:
+  pp-db-tier:
+  pp-proxy-tier:
