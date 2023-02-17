@@ -19,6 +19,7 @@ services:
     networks:
       - app-tier
       - db-tier
+      - reverseproxy-nw
   db:
     container_name: mariadb
     image: mariadb
