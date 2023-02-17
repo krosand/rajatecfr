@@ -47,14 +47,10 @@ services:
       DB_MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       DB_MYSQL_NAME: ${WORDPRESS_DB_NAME}
     volumes:
-      - /mnt/docker/nginx-proxy-manager:/appdata
+      - /mnt/docker/ppnginx-proxy-manager/data:/data
+      - /mnt/docker/ppnginx-proxy-manager/letsencrypt:/etc/letsencrypt
     networks:
       - proxy-tier
-
-volumes:
-  wp_data:
-  db_data:
-  nginx_data:
 
 networks:
   app-tier:
