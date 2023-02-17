@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+  wordpress:
+    container_name: pp-wordpress
+    depends_on:
+      - ppdb
+    image: wordpress:latest
+    volumes:
+      - /mnt/docker/ppwordpress:/var/www/html
+      - /mnt/docker/ppwordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: ppdb:3306
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    ports:
+      - "8081:80"
+    networks:
+      - pp-app-tier
+      - pp-db-tier
+  ppdb:
+    container_name: pp-mariadb
+    image: mariadb
+    volumes:
+      - /mnt/docker/ppmariadb:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
+      MYSQL_USER: ${WORDPRESS_DB_USER}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    networks:
+      - pp-db-tier
+
+networks:
+  pp-app-tier:
+  pp-db-tier:
+  reverseproxy-nw:
